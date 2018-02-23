@@ -43,11 +43,11 @@ def load_data():
 		augmented_X = augmented_X + [img1, img2, img3, img4]
 		augmented_Y = augmented_Y + [Y[i]] * 4
 
-	# for i in range(1):
+	# for i in random.sample(range(len(augmented_X)), 20):
 	# 	print "True label: %d" % augmented_Y[i]
-		# cv2.imshow('image', augmented_X[i])
-		# cv2.waitKey(0)
-		# cv2.destroyAllWindows()
+	# 	cv2.imshow('image', augmented_X[i])
+	# 	cv2.waitKey(0)
+	# 	cv2.destroyAllWindows()
 
 	data_stats(augmented_Y)
 
@@ -168,17 +168,39 @@ def build_network(X, is_training, output_dimen=11, scope="scope"):
 	norm3 = tf.contrib.layers.layer_norm(
 		pool3,
 		scope=scope+'/norm3')
+	conv4 = tf.contrib.layers.conv2d(
+		norm3,
+		64,
+		3,
+		weights_regularizer = regularizer,
+		scope=scope+'/conv4')
+	pool4 = tf.contrib.layers.max_pool2d(
+		conv4,
+		2,
+		scope=scope+'/pool4')
+	norm4 = tf.contrib.layers.layer_norm(
+		pool4,
+		scope=scope+'/norm4')
 	hidden1 = tf.contrib.layers.fully_connected(
-		tf.contrib.layers.flatten(norm3),
-		512,
+		tf.contrib.layers.flatten(norm4),
+		1024,
 		weights_regularizer=regularizer,
 		scope=scope+'/hidden1')
 	dropout1 = tf.contrib.layers.dropout(
 		hidden1,
 		keep_prob,
 		is_training=is_training)
-	out = tf.contrib.layers.fully_connected(
+	hidden2 = tf.contrib.layers.fully_connected(
 		dropout1,
+		512,
+		weights_regularizer=regularizer,
+		scope=scope+'/hidden2')
+	dropout2 = tf.contrib.layers.dropout(
+		hidden2,
+		keep_prob,
+		is_training=is_training)
+	out = tf.contrib.layers.fully_connected(
+		dropout2,
 		output_dimen,
 		weights_regularizer=regularizer,
 		scope=scope+'/out',
