@@ -9,12 +9,12 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
-n_epochs = 500
+n_epochs = 5000
 dev_size = 30
-batch_size = 5
+batch_size = 16
 img_size = 50
 lamb = 0.1
-keep_prob = 0.8
+keep_prob = 0.5
 lr = 0.001
 
 def load_data():
@@ -256,14 +256,14 @@ if __name__ == '__main__':
 			max_train_accuracy = (train_accuracy, epoch+1)
 		if dev_accuracy > max_dev_accuracy[0]:
 			max_dev_accuracy = (dev_accuracy, epoch+1)
-		if (epoch+1) % 10 == 0:
+		if (epoch+1) % 100 == 0:
 			print "Average cost for epoch %d: %f" % (epoch+1, cost)
 			print "Train accuracy for epoch %d: %.2f%%" % (epoch+1, train_accuracy)
 			print "Dev accuracy for epoch %d: %.2f%%" % (epoch+1, dev_accuracy)
 	print "Minimum cost: %f in epoch %d" % min_cost
 	print "Maximum train accuracy: %.2f in epoch %d" % max_train_accuracy
 	print "Maximum dev accuracy: %.2f in epoch %d" % max_dev_accuracy
-	print "Displaying incorrectly classified train examples..."
-	display_images(incorrect_train_examples, incorrect_train_labels, incorrect_train_preds)
-	print "Displaying incorrectly classified dev examples..."
-	display_images(incorrect_dev_examples, incorrect_dev_labels, incorrect_dev_preds)
+	# print "Displaying incorrectly classified train examples..."
+	# display_images(incorrect_train_examples, incorrect_train_labels, incorrect_train_preds)
+	# print "Displaying incorrectly classified dev examples..."
+	# display_images(incorrect_dev_examples, incorrect_dev_labels, incorrect_dev_preds)
