@@ -264,7 +264,7 @@ def minibatch(X, Y):
 	batches = []
 	for i in range(len(X) / batch_size):
 		idxs = idxs[i*batch_size:min(i*batch_size+batch_size, len(X))]
-		batches.append([X[j] for j in idxs], [Y[j] for j in idxs])
+		batches.append(([X[j] for j in idxs], [Y[j] for j in idxs]))
 	return batches
 
 def display_images(imgs, labels, preds):
