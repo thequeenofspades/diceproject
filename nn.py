@@ -9,7 +9,7 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
-n_epochs = 5000
+n_epochs = 1000
 dev_size = 30
 batch_size = 16
 img_size = 100
