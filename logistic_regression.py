@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 n_epochs = 5000
 dev_size = 30
 batch_size = 16
-img_size = 50
+img_size = 100
 lamb = 0.1
 keep_prob = 0.5
 lr = 0.001
@@ -170,7 +170,7 @@ def build_network(X, is_training, output_dimen=11, scope="scope"):
 		scope=scope+'/norm3')
 	hidden1 = tf.contrib.layers.fully_connected(
 		tf.contrib.layers.flatten(norm3),
-		256,
+		512,
 		weights_regularizer=regularizer,
 		scope=scope+'/hidden1')
 	dropout1 = tf.contrib.layers.dropout(
