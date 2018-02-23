@@ -5,6 +5,7 @@ import time
 import random
 from skimage import color
 import matplotlib
+import argparse
 
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
@@ -13,6 +14,7 @@ n_epochs = 1000
 dev_size = 30
 batch_size = 16
 img_size = 100
+print_freq = 50
 lamb = 0.1
 keep_prob = 0.5
 lr = 0.001
@@ -276,26 +278,53 @@ def display_images(imgs, labels, preds):
 		cv2.waitKey(0)
 		cv2.destroyAllWindows()
 
+def process_arguments():
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-e', '--epochs', type=int)
+	parser.add_argument('-d', '--devsize', type=int)
+	parser.add_argument('-b', '--batchsize', type=int)
+	parser.add_argument('-p', '--printfreq', type=int)
+	args = parser.parse_args()
+	if args.epochs:
+		global n_epochs
+		n_epochs = args.epochs
+	if args.devsize:
+		global dev_size
+		dev_size = args.devsize
+	if args.batchsize:
+		global batch_size
+		batch_size = args.batchsize
+	if args.printfreq:
+		global print_freq
+		print_freq = args.printfreq
+
 if __name__ == '__main__':
+	process_arguments()
+
 	X, Y = load_data()
 	X_train, Y_train, X_dev, Y_dev = split_data(X, Y)
+
 	sess, train_op, loss, X_placeholder, Y_placeholder, out, predictions, dropout_placeholder = setup()
 	max_train_accuracy = (0.0,0)
 	max_dev_accuracy = (0.0,0)
+
 	for epoch in range(n_epochs):
 		epoch_cost = 0.0
+
 		minibatches = minibatch(X_train, Y_train)
 		for X_minibatch, Y_minibatch in minibatches:
 			output, cost, preds = train(sess, X_minibatch, Y_minibatch, X_placeholder, Y_placeholder, train_op, loss, out, predictions, dropout_placeholder)
 			epoch_cost += cost
+
 		epoch_cost = epoch_cost / float(len(minibatches))
+
 		train_accuracy, incorrect_train_examples, incorrect_train_labels, incorrect_train_preds = eval(sess, predictions, X_placeholder, Y_placeholder, X_train, Y_train, dropout_placeholder)
 		dev_accuracy, incorrect_dev_examples, incorrect_dev_labels, incorrect_dev_preds = eval(sess, predictions, X_placeholder, Y_placeholder, X_dev, Y_dev, dropout_placeholder)
 		if train_accuracy > max_train_accuracy[0]:
 			max_train_accuracy = (train_accuracy, epoch+1)
 		if dev_accuracy > max_dev_accuracy[0]:
 			max_dev_accuracy = (dev_accuracy, epoch+1)
-		if (epoch+1) % 100 == 0:
+		if (epoch+1) % print_freq == 0:
 			print "Average cost for epoch %d: %f" % (epoch+1, epoch_cost)
 			print "Train accuracy for epoch %d: %.2f%%" % (epoch+1, train_accuracy)
 			print "Dev accuracy for epoch %d: %.2f%%" % (epoch+1, dev_accuracy)
