@@ -54,6 +54,7 @@ def load_data():
 	return augmented_X, augmented_Y
 
 def data_stats(labels):
+	# Print some basic statistics about the dataset
 	unique, counts = np.unique(labels, return_counts=True)
 	print "%d training examples" % len(labels)
 	print "Counts for each label:"
@@ -61,9 +62,10 @@ def data_stats(labels):
 		print "%d: %f" % (unique[i], float(counts[i]) / np.sum(counts))
 
 def process_image(img):
+	# Normalize image and convert to grayscale
 	img = (img - np.mean(img, axis=(0,1), keepdims=True)) / np.std(img, axis=(0,1))
 	img = color.rgb2gray(img)
-	#img = (img - np.mean(img, keepdims=True)) / np.std(img)
+	# Rotate image 90, 180, and 270 degrees to add more training examples
 	height, width = img.shape
 	M = cv2.getRotationMatrix2D((height/2, width/2), 90, 1)
 	img2 = cv2.warpAffine(img, M, (height, width))
@@ -94,6 +96,7 @@ def read_labeled_image_list(image_list_file):
     return filenames, labels
 
 def split_data(X, Y):
+	# Shuffle data and split into train and dev sets (no test set is necessary at this stage)
 	idxs = range(len(X))
 	random.shuffle(idxs)
 	X = [X[i] for i in idxs]
@@ -106,6 +109,7 @@ def split_data(X, Y):
 	return X_train, Y_train, X_dev, Y_dev
 
 def setup():
+	# Set up the network
 	X_placeholder, Y_placeholder, dropout_placeholder = add_placeholders()
 	out = build_network(X_placeholder, dropout_placeholder)
 	predictions = tf.nn.softmax(out)
@@ -119,6 +123,7 @@ def setup():
 	return sess, train_op, loss, X_placeholder, Y_placeholder, out, predictions, dropout_placeholder
 
 def add_placeholders():
+	# Add placeholders to the graph
 	X_placeholder = tf.placeholder(tf.float32, (None, img_size, img_size, 1))
 	Y_placeholder = tf.placeholder(tf.int32, (None,))
 	dropout_placeholder = tf.placeholder(tf.bool, ())
@@ -126,15 +131,15 @@ def add_placeholders():
 	return X_placeholder, Y_placeholder, dropout_placeholder
 
 def build_network(X, is_training, output_dimen=11, scope="scope"):
+	# Basic network: (conv -> pool -> norm) x 4 -> (dense -> dropout) x 2 -> output
+	# Hyperparameters chosen arbitrarily, will tune later
 	regularizer = tf.contrib.layers.l2_regularizer(scale=lamb)
-	#print X.get_shape()
 	conv1 = tf.contrib.layers.conv2d(
 		X,
 		16,
 		7,
 		weights_regularizer = regularizer,
 		scope=scope+'/conv1')
-	#print conv1.get_shape()
 	pool1 = tf.contrib.layers.max_pool2d(
 		conv1,
 		2,
@@ -209,6 +214,7 @@ def build_network(X, is_training, output_dimen=11, scope="scope"):
 	return out
 
 def add_loss(out, labels):
+	# Categorical cross-entropy loss
 	loss = tf.nn.sparse_softmax_cross_entropy_with_logits(
 		logits=out,
 		labels=labels)
@@ -217,12 +223,14 @@ def add_loss(out, labels):
 	return loss
 
 def add_train_op(loss, lr=0.001):
+	# Add the training op to minimize loss
 	optimizer = tf.train.AdamOptimizer(learning_rate=lr)
 	train_op = optimizer.minimize(loss)
 
 	return train_op
 
 def train(sess, X, Y, X_placeholder, Y_placeholder, train_op, loss, out, predictions, dropout_placeholder):
+	# Train on a minibatch of examples
 	_, cost, out, predictions = sess.run((train_op, loss, out, predictions), feed_dict={
 		X_placeholder: X,
 		Y_placeholder: Y,
@@ -232,6 +240,8 @@ def train(sess, X, Y, X_placeholder, Y_placeholder, train_op, loss, out, predict
 	return out, cost, predictions
 
 def eval(sess, predictions, X_placeholder, Y_placeholder, X, Y, dropout_placeholder):
+	# Get predictions for a batch of examples and return accuracy compared to true labels
+	# Also return incorrect examples, labels, and predictions for review
 	preds = sess.run(predictions, feed_dict={
 		X_placeholder: X,
 		Y_placeholder: Y,
@@ -248,12 +258,17 @@ def eval(sess, predictions, X_placeholder, Y_placeholder, X, Y, dropout_placehol
 	return accuracy, incorrect_examples, incorrect_labels, incorrect_predictions
 
 def minibatch(X, Y):
+	# Randomly shuffle data into minibatches and return
 	idxs = range(len(X))
 	random.shuffle(idxs)
-	batch_idxs = idxs[:batch_size]
-	return [X[i] for i in batch_idxs], [Y[i] for i in batch_idxs]
+	batches = []
+	for i in range(len(X) / batch_size):
+		idxs = idxs[i*batch_size:min(i*batch_size+batch_size, len(X))]
+		batches.append([X[j] for j in idxs], [Y[j] for j in idxs])
+	return batches
 
 def display_images(imgs, labels, preds):
+	# Display images along with their true and predicted labels (for review)
 	for i in range(min(len(imgs), 10)):
 		print "True label: %d, predicted label: %d" % (labels[i], preds[i])
 		cv2.imshow('image', imgs[i])
@@ -266,12 +281,12 @@ if __name__ == '__main__':
 	sess, train_op, loss, X_placeholder, Y_placeholder, out, predictions, dropout_placeholder = setup()
 	max_train_accuracy = (0.0,0)
 	max_dev_accuracy = (0.0,0)
-	min_cost = (100.0,0)
 	for epoch in range(n_epochs):
-		X_minibatch, Y_minibatch = minibatch(X_train, Y_train)
-		output, cost, preds = train(sess, X_minibatch, Y_minibatch, X_placeholder, Y_placeholder, train_op, loss, out, predictions, dropout_placeholder)
-		if cost <= min_cost[0]:
-			min_cost = (cost, epoch+1)
+		epoch_cost = 0.0
+		for X_minibatch, Y_minibatch in minibatch(X_train, Y_train):
+			output, cost, preds = train(sess, X_minibatch, Y_minibatch, X_placeholder, Y_placeholder, train_op, loss, out, predictions, dropout_placeholder)
+			epoch_cost += cost
+		epoch_cost = epoch_cost / (float(len(X_train)) / batch_size)
 		train_accuracy, incorrect_train_examples, incorrect_train_labels, incorrect_train_preds = eval(sess, predictions, X_placeholder, Y_placeholder, X_train, Y_train, dropout_placeholder)
 		dev_accuracy, incorrect_dev_examples, incorrect_dev_labels, incorrect_dev_preds = eval(sess, predictions, X_placeholder, Y_placeholder, X_dev, Y_dev, dropout_placeholder)
 		if train_accuracy > max_train_accuracy[0]:
@@ -279,10 +294,9 @@ if __name__ == '__main__':
 		if dev_accuracy > max_dev_accuracy[0]:
 			max_dev_accuracy = (dev_accuracy, epoch+1)
 		if (epoch+1) % 100 == 0:
-			print "Average cost for epoch %d: %f" % (epoch+1, cost)
+			print "Average cost for epoch %d: %f" % (epoch+1, epoch_cost)
 			print "Train accuracy for epoch %d: %.2f%%" % (epoch+1, train_accuracy)
 			print "Dev accuracy for epoch %d: %.2f%%" % (epoch+1, dev_accuracy)
-	print "Minimum cost: %f in epoch %d" % min_cost
 	print "Maximum train accuracy: %.2f in epoch %d" % max_train_accuracy
 	print "Maximum dev accuracy: %.2f in epoch %d" % max_dev_accuracy
 	# print "Displaying incorrectly classified train examples..."
