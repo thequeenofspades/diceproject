@@ -262,9 +262,10 @@ def minibatch(X, Y):
 	idxs = range(len(X))
 	random.shuffle(idxs)
 	batches = []
-	for i in range(len(X) / batch_size):
-		idxs = idxs[i*batch_size:min(i*batch_size+batch_size, len(X))]
-		batches.append(([X[j] for j in idxs], [Y[j] for j in idxs]))
+	for i in range(len(X) / batch_size + 1):
+		batch_idxs = idxs[i*batch_size : min(i*batch_size+batch_size, len(X))]
+		if len(batch_idxs) > 0:
+			batches.append(([X[j] for j in batch_idxs], [Y[j] for j in batch_idxs]))
 	return batches
 
 def display_images(imgs, labels, preds):
@@ -283,10 +284,11 @@ if __name__ == '__main__':
 	max_dev_accuracy = (0.0,0)
 	for epoch in range(n_epochs):
 		epoch_cost = 0.0
-		for X_minibatch, Y_minibatch in minibatch(X_train, Y_train):
+		minibatches = minibatch(X_train, Y_train)
+		for X_minibatch, Y_minibatch in minibatches:
 			output, cost, preds = train(sess, X_minibatch, Y_minibatch, X_placeholder, Y_placeholder, train_op, loss, out, predictions, dropout_placeholder)
 			epoch_cost += cost
-		epoch_cost = epoch_cost / (float(len(X_train)) / batch_size)
+		epoch_cost = epoch_cost / float(len(minibatches))
 		train_accuracy, incorrect_train_examples, incorrect_train_labels, incorrect_train_preds = eval(sess, predictions, X_placeholder, Y_placeholder, X_train, Y_train, dropout_placeholder)
 		dev_accuracy, incorrect_dev_examples, incorrect_dev_labels, incorrect_dev_preds = eval(sess, predictions, X_placeholder, Y_placeholder, X_dev, Y_dev, dropout_placeholder)
 		if train_accuracy > max_train_accuracy[0]:
