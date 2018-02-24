@@ -1,0 +1,10 @@
+../examples/examples/20180208_151622.jpg
+../examples/examples/20180208_151814.jpg
+../examples/examples/20180208_151938.jpg
+../examples/examples/20180208_152126.jpg
+../examples/examples/20180208_152345.jpg
+../examples/examples/20180208_152704.jpg
+../examples/examples/20180208_152835.jpg
+../examples/examples/20180208_152955.jpg
+../examples/examples/20180208_153108.jpg
+../examples/examples/20180208_153357.jpg
