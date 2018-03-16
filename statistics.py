@@ -7,6 +7,7 @@ threshold = 0.5
 pred_path = 'predictions.txt'
 label_path = 'examples/examples/'
 img_path = 'examples/examples/'
+verbose = 1
 
 def read_predictions(path):
 	pred_file = open(path, 'r')
@@ -101,12 +102,14 @@ def center(bbox):
 def closest_label(bbox, labels):
 	closest_dist = 10000
 	closest = None
-	print "Finding closest label to %s" % str(bbox[1:])
+	if verbose > 1:
+		print "Finding closest label to %s" % str(bbox[1:])
 	_, x1, y1, x2, y2 = bbox
 	for label in labels:
 		_, x1p, y1p, x2p, y2p = label
 		dist = np.sqrt((x1p - x1)**2 + (y1p - y1)**2 + (x2p - x2)**2 + (y2p - y2)**2)
-		print "--->%s: %f" % (str(label[1:]), dist)
+		if verbose > 1:
+			print "--->%s: %f" % (str(label[1:]), dist)
 		if dist < closest_dist:
 			closest_dist = dist
 			closest = label
@@ -131,7 +134,8 @@ def avg_iou(bboxes, labels):
 		closest_labels.append(closest)
 		num_fp += fp
 		num_tp += 1 - fp
-		print "Found match for %s: %s" % (str(bbox[1:]), str(closest[1:]))
+		if verbose > 1:
+			print "Found match for %s: %s" % (str(bbox[1:]), str(closest[1:]))
 		total_iou += iou(bbox, closest)
 	for label in labels:
 		found = False
@@ -147,18 +151,22 @@ def avg_iou(bboxes, labels):
 	return total_iou / float(len(bboxes)), avg_precision, avg_recall
 
 def img_stats(img_name, preds):
-	print "Getting statistics for %s" % img_name
+	if verbose > 0:
+		print "Getting statistics for %s" % img_name
 	img = plt.imread(img_path + img_name + '.jpg')
 	labels = read_labels(img_name)
 	abs_labels = [convert_label(img, label) for label in labels]
 	nms_preds = nms(preds)
-	print "Found %d predictions after NMS" % len(nms_preds)
-	print "True number of objects: %d" % len(labels)
+	if verbose > 0:
+		print "Found %d predictions after NMS" % len(nms_preds)
+	if verbose > 0:
+		print "True number of objects: %d" % len(labels)
 	average_iou, avg_precision, avg_recall = avg_iou(nms_preds, abs_labels)
-	print "Average IoU: %f" % average_iou
-	print "Average precision: %f" % avg_precision
-	print "Average recall: %f" % avg_recall
-	print ""
+	if verbose > 0:
+		print "Average IoU: %f" % average_iou
+		print "Average precision: %f" % avg_precision
+		print "Average recall: %f" % avg_recall
+		print ""
 	return len(nms_preds), average_iou, avg_precision, avg_recall
 
 def main():
