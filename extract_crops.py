@@ -67,8 +67,8 @@ def main():
 		img_preds = [pred[1:] for pred in img_preds]
 		crops = extract_crops(img, img_preds)
 		save_crops(crops, save_path + img_name)
-		img = draw_bboxes(img, img_preds, 'bbox')
-		img.save(save_path + img_name + '.jpg')
+		# img = draw_bboxes(img, img_preds, 'bbox')
+		# img.save(save_path + img_name + '.jpg')
 
 if __name__ == '__main__':
 	main()

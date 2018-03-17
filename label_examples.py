@@ -1,27 +1,25 @@
 from PIL import Image
 from os import listdir
 
+
 # Display each unlabeled image from the training set and accept an integer label as input
 # Save labels and corresponding filename to labels.txt
 
 if __name__ == '__main__':
-	cleaned_dir = '/Users/shalinmehta/Documents/Hana/Stanford/dice_project/cleaned_dice_pics'
-	labels_filename = '/Users/shalinmehta/Documents/Hana/Stanford/dice_project/labels.txt'
-	labels_file = open(labels_filename, 'a+')
-	labels_file_read = open(labels_filename, 'r')
-	labels_idx = len(labels_file_read.readlines())+1
-	labels_file_read.close()
-	print "Starting at index %d" % labels_idx
-	examples = sorted([f for f in listdir(cleaned_dir) if f.endswith('.png')])
-	labels = []
-	for i in range(labels_idx, len(examples)):
-		img = Image.open(cleaned_dir + '/' + examples[i])
-		img.show()
-		label = int(raw_input('Label: '))
-		labels.append(label)
+	img_path = 'examples/images/'
+	labels_path = 'examples/labels/'
+	img_paths = sorted([path for path in listdir(img_path) if path.endswith('.jpg')])
+	done_labels = [path for path in listdir(labels_path) if path.endswith('.txt')]
+	for i in range(len(done_labels), len(img_paths)):
+		img_filepath = img_paths[i]
+		img_name = img_filepath[:-len('.jpg')]
+		label_path = labels_path + img_name + '.txt'
+		label_file = open(label_path, 'w+')
+		img = Image.open(img_path + img_filepath)
+		img.resize((100, 100)).show()
+		print 'Labeling %s' % (img_name)
+		die_type = raw_input('What is the type? ')
+		die_value = raw_input('What is the value? ')
+		label_file.write('%d %d' % (int(die_type), int(die_value)))
 		img.close()
-	for i in range(len(labels)):
-		if labels_idx+i > 0:
-			labels_file.write('\n')
-		labels_file.write('./cleaned_dice_pics/' + examples[labels_idx+i] + ' ' + str(labels[i]))
-	labels_file.close()
+		label_file.close()
