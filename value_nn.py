@@ -25,7 +25,7 @@ class ValueNN():
 		self.dropout_placeholder = tf.placeholder(tf.bool, ())
 
 	def network(self):
-		regularizer = tf.contrib.layers.l2_regularizer(scale=self.config.val_lamb)
+		# regularizer = tf.contrib.layers.l2_regularizer(scale=self.config.val_lamb)
 		layers = [self.X_placeholder]
 		layer_sizes = [16, 32, 64]
 		filter_sizes = [7, 5, 3]
@@ -33,8 +33,8 @@ class ValueNN():
 			conv_layer = tf.contrib.layers.conv2d(
 				layers[i - 1],
 				layer_sizes[i],
-				filter_sizes[i],
-				weights_regularizer=regularizer)
+				filter_sizes[i])
+				# weights_regularizer=regularizer)
 			pool_layer = tf.contrib.layers.max_pool2d(
 				conv_layer,
 				2)
@@ -43,16 +43,16 @@ class ValueNN():
 			layers.append(norm_layer)
 		hidden = tf.contrib.layers.fully_connected(
 			tf.contrib.layers.flatten(layers[-1]),
-			512,
-			weights_regularizer=regularizer)
-		dropout = tf.contrib.layers.dropout(
-			hidden,
-			self.config.val_keep_prob,
-			is_training=self.dropout_placeholder)
+			512)
+			# weights_regularizer=regularizer)
+		# dropout = tf.contrib.layers.dropout(
+		# 	hidden,
+		# 	self.config.val_keep_prob,
+		# 	is_training=self.dropout_placeholder)
 		self.output = tf.contrib.layers.fully_connected(
-			dropout,
+			hidden,
 			self.config.val_num_classes,
-			weights_regularizer=regularizer,
+			# weights_regularizer=regularizer,
 			activation_fn=None)
 		self.preds = tf.nn.softmax(self.output)
 
