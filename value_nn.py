@@ -91,9 +91,17 @@ class ValueNN():
 		return accuracy
 
 	def predict(self, X):
-		preds = self.sess.run((self.preds), feed_dict={
-			self.X_placeholder: X,
-			self.dropout_placeholder: False})
+		batches = []
+		num_batches = len(X) / self.config.batch_size
+		if num_batches * self.config.batch_size < len(X):
+			num_batches = num_batches + 1
+		preds = np.zeros((len(X), self.config.val_num_classes))
+		for i in range(num_batches):
+			batch = range(len(X))[i*self.config.batch_size:(i+1)*self.config.batch_size]
+			batch_preds = self.sess.run((self.preds), feed_dict={
+				self.X_placeholder: X[batch],
+				self.dropout_placeholder: False})
+			preds[batch] = batch_preds
 		return preds
 
 	def validate(self, X, Y):
@@ -104,6 +112,7 @@ class ValueNN():
 
 	def train(self, X, Y, steps=100):
 		losses = []
+		batch_nums = []
 		for step in range(steps):
 			idx = np.random.choice(range(len(X)), self.config.batch_size, replace=False)
 			loss, preds, _ = self.sess.run((self.loss, self.preds, self.train_op), feed_dict={
@@ -111,12 +120,12 @@ class ValueNN():
 				self.Y_placeholder: Y[idx],
 				self.dropout_placeholder: True})
 			losses.append(loss)
-			if len(losses) > 100:
-				losses.pop(0)
-			avg_loss = sum(losses) / float(len(losses))
+			batch_nums.append(tf.train.global_step(self.sess, self.global_step) + 1)
+			avg_loss = sum(losses[-100:]) / 100.0
 			if (step + 1) % self.config.print_freq == 0:
-				print "batch: %d, loss: %f, avg loss: %f, accuracy: %f" % (step+1, loss, avg_loss, self.accuracy(preds, Y[idx]))
+				print "batch: %d, loss: %f, avg loss: %f, accuracy: %f" % (batch_nums[-1], loss, avg_loss, self.accuracy(preds, Y[idx]))
 				preds = np.argmax(preds, 1)
 				print "predictions: %s" % str(preds)
-			if (step + 1) % self.config.save_freq == 0:
+			if batch_nums[-1] % self.config.save_freq == 0:
 				self.save()
+		return losses, batch_nums

@@ -6,10 +6,11 @@ class config():
 	n_channels = 1
 
 	#Training params
-	batches = 200
+	batches = 500
 	batch_size = 16
 	save_freq = 100
 	print_freq = 1
+	eval_freq = 10
 	save_path = 'weights/'
 
 	#Type NN params
@@ -26,8 +27,8 @@ class config():
 						18: 17, 19: 18, 20: 19}
 	val_num_classes = 20
 	val_lamb = 0.1
-	val_keep_prob = 0.5
-	val_lr = 0.001
+	val_keep_prob = 0.8
+	val_lr = 0.01
 	val_layers = 3
 	val_save_path = 'val/'
 	val_weights_to_restore = None
