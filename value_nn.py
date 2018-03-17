@@ -17,8 +17,9 @@ class ValueNN(NN):
 			pool_layer = tf.contrib.layers.max_pool2d(
 				conv_layer,
 				2)
-			norm_layer = tf.contrib.layers.layer_norm(
-				pool_layer)
+			norm_layer = tf.contrib.layers.batch_norm(
+				pool_layer,
+				is_training=self.dropout_placeholder)
 			layers.append(norm_layer)
 		hidden = tf.contrib.layers.fully_connected(
 			tf.contrib.layers.flatten(layers[-1]),
