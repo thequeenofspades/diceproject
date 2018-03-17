@@ -113,5 +113,7 @@ class ValueNN():
 			avg_loss = total_loss / (step + 1)
 			if (step + 1) % self.config.print_freq == 0:
 				print "batch: %d, loss: %f, avg loss: %f, accuracy: %f" % (step+1, loss, avg_loss, self.accuracy(preds, Y[idx]))
+				preds = np.argmax(preds, 1)
+				print "predictions: %s" % str(preds)
 			if (step + 1) % self.config.save_freq == 0:
 				self.save()

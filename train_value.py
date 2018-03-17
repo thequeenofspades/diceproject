@@ -8,9 +8,10 @@ import random
 img_path = 'examples/images/'
 label_path = 'examples/labels/'
 
-def load_train_data():
+def load_train_data(mode='val'):
 	print "Loading image and label data..."
-	imgs, labels = load_data('train.txt')
+	imgs, labels = load_data('train.txt', mode)
+	analyze_labels(labels)
 	print "Resizing and processing images..."
 	imgs = resize_imgs(imgs)
 	imgs = process_image(imgs)
@@ -20,9 +21,9 @@ def load_train_data():
 	labels = np.array(labels)
 	return imgs, labels
 
-def load_dev_data():
+def load_dev_data(mode='val'):
 	print "Loading image and label data..."
-	imgs, labels = load_data('dev.txt')
+	imgs, labels = load_data('dev.txt', mode)
 	print "Resizing and processing images..."
 	imgs = resize_imgs(imgs)
 	imgs = process_image(imgs)
@@ -30,7 +31,7 @@ def load_dev_data():
 	labels = np.array(labels)
 	return imgs, labels
 
-def load_data(path):
+def load_data(path, mode='val'):
 	data_file = open(path, 'r')
 	imgs = []
 	labels = []
@@ -42,7 +43,10 @@ def load_data(path):
 		label_file = open(label_path + img_name + '.txt', 'r')
 		label = [line for line in label_file][0].split()
 		label_file.close()
-		label = config.val_class_mapping[int(label[1])]
+		if mode == 'val':
+			label = config.val_class_mapping[int(label[1])]
+		elif mode == 'type':
+			label = config.type_class_mapping[int(label[0])]
 		labels.append(label)
 	data_file.close()
 	return imgs, labels
@@ -67,9 +71,20 @@ def augment(imgs, labels):
 		new_labels = new_labels + [labels[i]] * 4
 	return new_imgs, new_labels
 
+def analyze_labels(labels):
+	counts = {}
+	for label in labels:
+		value = label
+		if value in counts:
+			counts[value] += 1
+		else:
+			counts[value] = 1
+	counts = {k: counts[k] / float(len(labels)) for k in counts}
+	print counts
+
 if __name__ == '__main__':
 	nn = ValueNN(config)
-	X_train, Y_train = load_train_data()
-	X_dev, Y_dev = load_dev_data()
+	X_train, Y_train = load_train_data('val')
+	X_dev, Y_dev = load_dev_data('val')
 	nn.train(X_train, Y_train, config.batches)
 	print "Dev accuracy: %f" % nn.validate(X_dev, Y_dev)
