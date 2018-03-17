@@ -87,4 +87,5 @@ if __name__ == '__main__':
 	X_train, Y_train = load_train_data('val')
 	X_dev, Y_dev = load_dev_data('val')
 	nn.train(X_train, Y_train, config.batches)
+	print "Train accuracy: %f" % nn.validate(X_train, Y_train)
 	print "Dev accuracy: %f" % nn.validate(X_dev, Y_dev)
