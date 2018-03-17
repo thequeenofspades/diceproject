@@ -120,7 +120,7 @@ class ValueNN():
 				self.Y_placeholder: Y[idx],
 				self.dropout_placeholder: True})
 			losses.append(loss)
-			batch_nums.append(tf.train.global_step(self.sess, self.global_step) + 1)
+			batch_nums.append(tf.train.global_step(self.sess, self.global_step))
 			avg_loss = sum(losses[-100:]) / len(losses[-100:])
 			if (step + 1) % self.config.print_freq == 0:
 				print "batch: %d, loss: %f, avg loss: %f, accuracy: %f" % (batch_nums[-1], loss, avg_loss, self.accuracy(preds, Y[idx]))
