@@ -8,9 +8,9 @@ label_path = 'examples/labels/'
 loss_path = 'losses_type.txt'
 eval_path = 'eval_type.txt'
 
-def train(nn, X, Y, batches):
+def train(nn, X, Y, batches, losses):
 	loss_file = open(loss_path, 'a+')
-	losses, steps = nn.train(X, Y, batches)
+	losses, steps = nn.train(X, Y, batches, losses)
 	for i in range(len(losses)):
 		loss_file.write('%d %f\n' % (steps[i], losses[i]))
 	loss_file.close()
