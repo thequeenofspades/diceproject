@@ -21,7 +21,7 @@ def eval(X_train, Y_train, X_dev, Y_dev, step):
 	eval_file = open(eval_path, 'a+')
 	_, train_acc = nn.validate(X_train, Y_train)
 	_, dev_acc = nn.validate(X_dev, Y_dev)
-	eval_file.write('%d %f %f' % (step, train_acc, dev_acc))
+	eval_file.write('%d %f %f\n' % (step, train_acc, dev_acc))
 	eval_file.close()
 	print "Train accuracy: %f" % train_acc
 	print "Dev accuracy: %f" % dev_acc
