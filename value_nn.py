@@ -100,7 +100,7 @@ class ValueNN():
 		preds = self.predict(X)
 		accuracy = self.accuracy(preds, Y)
 		preds = np.argmax(preds, 1)
-		return accuracy, preds
+		return preds, accuracy
 
 	def train(self, X, Y, steps=100):
 		losses = []
