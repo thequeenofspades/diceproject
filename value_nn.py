@@ -99,7 +99,8 @@ class ValueNN():
 	def validate(self, X, Y):
 		preds = self.predict(X)
 		accuracy = self.accuracy(preds, Y)
-		return accuracy
+		preds = np.argmax(preds, 1)
+		return accuracy, preds
 
 	def train(self, X, Y, steps=100):
 		losses = []
@@ -110,7 +111,7 @@ class ValueNN():
 				self.Y_placeholder: Y[idx],
 				self.dropout_placeholder: True})
 			losses.append(loss)
-			if len(losses) > 50:
+			if len(losses) > 100:
 				losses.pop(0)
 			avg_loss = sum(losses) / float(len(losses))
 			if (step + 1) % self.config.print_freq == 0:

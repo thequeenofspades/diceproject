@@ -2,6 +2,20 @@ import numpy as np
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
+from PIL import Image, ImageOps
+from os import listdir
+from config import config
+
+def analyze_labels(labels):
+	counts = {}
+	for label in labels:
+		value = label
+		if value in counts:
+			counts[value] += 1
+		else:
+			counts[value] = 1
+	counts = {k: counts[k] / float(len(labels)) for k in counts}
+	print counts
 
 def augment(imgs, labels):
 	new_imgs = []
@@ -43,9 +57,8 @@ def convert_label(img, label, fm='yolo', img_fm=None):
 		return [x, y, width, height]
 
 def load_train_data(img_path, label_path, mode='val'):
-	print "Loading image and label data..."
+	print "Loading image and label data from train..."
 	imgs, labels = load_data(img_path, label_path, 'train.txt', mode)
-	analyze_labels(labels)
 	print "Resizing and processing images..."
 	imgs = resize_imgs(imgs)
 	imgs = process_image(imgs)
@@ -56,7 +69,7 @@ def load_train_data(img_path, label_path, mode='val'):
 	return imgs, labels
 
 def load_dev_data(img_path, label_path, mode='val'):
-	print "Loading image and label data..."
+	print "Loading image and label data from dev..."
 	imgs, labels = load_data(img_path, label_path, 'dev.txt', mode)
 	print "Resizing and processing images..."
 	imgs = resize_imgs(imgs)
@@ -66,7 +79,7 @@ def load_dev_data(img_path, label_path, mode='val'):
 	return imgs, labels
 
 def load_test_data(img_path, label_path, mode='val'):
-	print "Loading image and label data..."
+	print "Loading image and label data from test..."
 	imgs, labels = load_data(img_path, label_path, 'test.txt', mode)
 	print "Resizing and processing images..."
 	imgs = resize_imgs(imgs)
@@ -93,6 +106,7 @@ def load_data(img_path, label_path, path, mode='val'):
 			label = config.type_class_mapping[int(label[0])]
 		labels.append(label)
 	data_file.close()
+	analyze_labels(labels)
 	return imgs, labels
 
 def nms(bboxes):
