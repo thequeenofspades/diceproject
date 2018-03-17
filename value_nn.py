@@ -12,8 +12,8 @@ class ValueNN(NN):
 			conv_layer = tf.contrib.layers.conv2d(
 				layers[i - 1],
 				layer_sizes[i],
-				filter_sizes[i])
-				weights_regularizer=regularizer
+				filter_sizes[i],
+				weights_regularizer=regularizer)
 			pool_layer = tf.contrib.layers.max_pool2d(
 				conv_layer,
 				2)
@@ -22,7 +22,7 @@ class ValueNN(NN):
 			layers.append(norm_layer)
 		hidden = tf.contrib.layers.fully_connected(
 			tf.contrib.layers.flatten(layers[-1]),
-			512
+			512,
 			weights_regularizer=regularizer)
 		# dropout = tf.contrib.layers.dropout(
 		# 	hidden,
