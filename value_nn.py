@@ -4,7 +4,7 @@ from nn import NN
 
 class ValueNN(NN):
 	def network(self):
-		# regularizer = tf.contrib.layers.l2_regularizer(scale=self.config.val_lamb)
+		regularizer = tf.contrib.layers.l2_regularizer(scale=self.config.val_lamb)
 		layers = [self.X_placeholder]
 		layer_sizes = self.config.val_layer_sizes
 		filter_sizes = self.config.val_filter_sizes
@@ -13,7 +13,7 @@ class ValueNN(NN):
 				layers[i - 1],
 				layer_sizes[i],
 				filter_sizes[i])
-				# weights_regularizer=regularizer)
+				weights_regularizer=regularizer
 			pool_layer = tf.contrib.layers.max_pool2d(
 				conv_layer,
 				2)
@@ -22,8 +22,8 @@ class ValueNN(NN):
 			layers.append(norm_layer)
 		hidden = tf.contrib.layers.fully_connected(
 			tf.contrib.layers.flatten(layers[-1]),
-			512)
-			# weights_regularizer=regularizer)
+			512
+			weights_regularizer=regularizer)
 		# dropout = tf.contrib.layers.dropout(
 		# 	hidden,
 		# 	self.config.val_keep_prob,
@@ -31,7 +31,7 @@ class ValueNN(NN):
 		self.output = tf.contrib.layers.fully_connected(
 			hidden,
 			self.config.val_num_classes,
-			# weights_regularizer=regularizer,
+			weights_regularizer=regularizer,
 			activation_fn=None)
 		self.preds = tf.nn.softmax(self.output)
 
