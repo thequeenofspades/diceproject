@@ -1,12 +1,12 @@
 import numpy as np
-from value_nn import ValueNN
+from type_nn import TypeNN
 from config import config
 from utils import load_train_data, load_dev_data
 
 img_path = 'examples/images/'
 label_path = 'examples/labels/'
-loss_path = 'losses_val.txt'
-eval_path = 'eval_val.txt'
+loss_path = 'losses_type.txt'
+eval_path = 'eval_type.txt'
 
 def train(nn, X, Y, batches):
 	loss_file = open(loss_path, 'a+')
@@ -27,9 +27,9 @@ def eval(nn, X_train, Y_train, X_dev, Y_dev, step):
 	print "Dev accuracy: %f" % dev_acc
 
 if __name__ == '__main__':
-	nn = ValueNN(config)
-	X_train, Y_train = load_train_data(img_path, label_path, 'val')
-	X_dev, Y_dev = load_dev_data(img_path, label_path, 'val')
+	nn = TypeNN(config)
+	X_train, Y_train = load_train_data(img_path, label_path, 'type')
+	X_dev, Y_dev = load_dev_data(img_path, label_path, 'type')
 
 	times_to_eval = int(config.batches / config.eval_freq)
 	for i in range(times_to_eval):
