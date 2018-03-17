@@ -42,8 +42,7 @@ class NN:
 		preds = np.argmax(preds, 1)
 		return preds, accuracy
 
-	def train(self, X, Y, steps=100):
-		losses = []
+	def train(self, X, Y, steps=100, losses=[]):
 		batch_nums = []
 		for step in range(steps):
 			idx = np.random.choice(range(len(X)), self.config.batch_size, replace=False)

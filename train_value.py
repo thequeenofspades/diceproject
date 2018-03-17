@@ -14,7 +14,7 @@ def train(nn, X, Y, batches):
 	for i in range(len(losses)):
 		loss_file.write('%d %f\n' % (steps[i], losses[i]))
 	loss_file.close()
-	return steps[-1]
+	return losses[-100:], steps[-1]
 
 def eval(nn, X_train, Y_train, X_dev, Y_dev, step):
 	print "Evaluating..."
@@ -32,6 +32,7 @@ if __name__ == '__main__':
 	X_dev, Y_dev = load_dev_data(img_path, label_path, 'val')
 
 	times_to_eval = int(config.batches / config.eval_freq)
+	losses = []
 	for i in range(times_to_eval):
-		step = train(nn, X_train, Y_train, config.eval_freq)
+		losses, step = train(nn, X_train, Y_train, config.eval_freq, losses)
 		eval(nn, X_train, Y_train, X_dev, Y_dev, step)
