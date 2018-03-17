@@ -3,6 +3,17 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
+def augment(imgs, labels):
+	new_imgs = []
+	new_labels = []
+	for i in range(len(imgs)):
+		new_imgs.append(imgs[i])
+		new_imgs.append(imgs[i].rotate(90))
+		new_imgs.append(imgs[i].rotate(180))
+		new_imgs.append(imgs[i].rotate(270))
+		new_labels = new_labels + [labels[i]] * 4
+	return new_imgs, new_labels
+
 def convert_label(img, label, fm='yolo', img_fm=None):
 	if img_fm == 'PIL':
 		img_width = img.width
@@ -31,6 +42,59 @@ def convert_label(img, label, fm='yolo', img_fm=None):
 		height = (y_end - y_start) / float(img_height)
 		return [x, y, width, height]
 
+def load_train_data(img_path, label_path, mode='val'):
+	print "Loading image and label data..."
+	imgs, labels = load_data(img_path, label_path, 'train.txt', mode)
+	analyze_labels(labels)
+	print "Resizing and processing images..."
+	imgs = resize_imgs(imgs)
+	imgs = process_image(imgs)
+	print "Augmenting images..."
+	imgs, labels = augment(imgs, labels)
+	imgs = np.array([np.array(img).reshape(config.img_size, config.img_size, config.n_channels) for img in imgs])
+	labels = np.array(labels)
+	return imgs, labels
+
+def load_dev_data(img_path, label_path, mode='val'):
+	print "Loading image and label data..."
+	imgs, labels = load_data(img_path, label_path, 'dev.txt', mode)
+	print "Resizing and processing images..."
+	imgs = resize_imgs(imgs)
+	imgs = process_image(imgs)
+	imgs = np.array([np.array(img).reshape(config.img_size, config.img_size, config.n_channels) for img in imgs])
+	labels = np.array(labels)
+	return imgs, labels
+
+def load_test_data(img_path, label_path, mode='val'):
+	print "Loading image and label data..."
+	imgs, labels = load_data(img_path, label_path, 'test.txt', mode)
+	print "Resizing and processing images..."
+	imgs = resize_imgs(imgs)
+	imgs = process_image(imgs)
+	imgs = np.array([np.array(img).reshape(config.img_size, config.img_size, config.n_channels) for img in imgs])
+	labels = np.array(labels)
+	return imgs, labels
+
+def load_data(img_path, label_path, path, mode='val'):
+	data_file = open(path, 'r')
+	imgs = []
+	labels = []
+	for line in data_file:
+		img_name = line.split()[0]
+		img = Image.open(img_path + img_name + '.jpg')
+		img.load()
+		imgs.append(img)
+		label_file = open(label_path + img_name + '.txt', 'r')
+		label = [line for line in label_file][0].split()
+		label_file.close()
+		if mode == 'val':
+			label = config.val_class_mapping[int(label[1])]
+		elif mode == 'type':
+			label = config.type_class_mapping[int(label[0])]
+		labels.append(label)
+	data_file.close()
+	return imgs, labels
+
 def nms(bboxes):
 	nms_bboxes = []
 	bboxes = sorted(bboxes, key=lambda x: x[0], reverse=True)
@@ -47,6 +111,11 @@ def nms(bboxes):
 			nms_bboxes.append(bbox)
 	return nms_bboxes
 
+def process_image(imgs):
+	new_imgs = [img.convert('L') for img in imgs]
+	new_imgs = [ImageOps.equalize(img) for img in new_imgs]
+	return new_imgs
+
 def read_predictions(path, threshold):
 	pred_file = open(path, 'r')
 	predictions = {}
@@ -57,3 +126,7 @@ def read_predictions(path, threshold):
 		if float(pred[1]) > threshold:
 			predictions[pred[0]].append([float(pred[1])] + [int(float(x)) for x in pred[2:]])
 	return predictions
+
+def resize_imgs(imgs):
+	new_imgs = [img.resize((config.img_size, config.img_size)) for img in imgs]
+	return new_imgs
