@@ -110,8 +110,8 @@ class ValueNN():
 				self.Y_placeholder: Y[idx],
 				self.dropout_placeholder: True})
 			losses.append(loss)
-			if len(loss) > 50:
-				loss.pop(0)
+			if len(losses) > 50:
+				losses.pop(0)
 			avg_loss = sum(losses) / float(len(losses))
 			if (step + 1) % self.config.print_freq == 0:
 				print "batch: %d, loss: %f, avg loss: %f, accuracy: %f" % (step+1, loss, avg_loss, self.accuracy(preds, Y[idx]))
