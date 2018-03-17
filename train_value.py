@@ -11,6 +11,7 @@ eval_path = 'eval_val.txt'
 def train(nn, X, Y, batches, losses):
 	loss_file = open(loss_path, 'a+')
 	losses, steps = nn.train(X, Y, batches, losses)
+	losses = losses[-len(steps):]
 	for i in range(len(losses)):
 		loss_file.write('%d %f\n' % (steps[i], losses[i]))
 	loss_file.close()
