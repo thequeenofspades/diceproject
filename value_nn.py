@@ -27,8 +27,8 @@ class ValueNN():
 	def network(self):
 		# regularizer = tf.contrib.layers.l2_regularizer(scale=self.config.val_lamb)
 		layers = [self.X_placeholder]
-		layer_sizes = [16, 32, 64]
-		filter_sizes = [7, 5, 3]
+		layer_sizes = self.config.val_layer_sizes
+		filter_sizes = self.config.val_filter_sizes
 		for i in range(self.config.val_layers):
 			conv_layer = tf.contrib.layers.conv2d(
 				layers[i - 1],
