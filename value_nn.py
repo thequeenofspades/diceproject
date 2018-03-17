@@ -102,15 +102,17 @@ class ValueNN():
 		return accuracy
 
 	def train(self, X, Y, steps=100):
-		total_loss = 0.0
+		losses = []
 		for step in range(steps):
 			idx = np.random.choice(range(len(X)), self.config.batch_size, replace=False)
 			loss, preds, _ = self.sess.run((self.loss, self.preds, self.train_op), feed_dict={
 				self.X_placeholder: X[idx],
 				self.Y_placeholder: Y[idx],
 				self.dropout_placeholder: True})
-			total_loss += loss
-			avg_loss = total_loss / (step + 1)
+			losses.append(loss)
+			if len(loss) > 50:
+				loss.pop(0)
+			avg_loss = sum(losses) / float(len(losses))
 			if (step + 1) % self.config.print_freq == 0:
 				print "batch: %d, loss: %f, avg loss: %f, accuracy: %f" % (step+1, loss, avg_loss, self.accuracy(preds, Y[idx]))
 				preds = np.argmax(preds, 1)
