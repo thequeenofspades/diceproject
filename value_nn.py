@@ -26,10 +26,10 @@ class ValueNN(NN):
 			tf.contrib.layers.flatten(layers[-1]),
 			512,
 			weights_regularizer=regularizer)
-		# dropout = tf.contrib.layers.dropout(
-		# 	hidden,
-		# 	self.config.val_keep_prob,
-		# 	is_training=self.dropout_placeholder)
+		dropout = tf.contrib.layers.dropout(
+			hidden,
+			self.config.val_keep_prob,
+			is_training=self.dropout_placeholder)
 		self.output = tf.contrib.layers.fully_connected(
 			hidden,
 			self.config.val_num_classes,
