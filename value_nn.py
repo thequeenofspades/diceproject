@@ -31,7 +31,7 @@ class ValueNN(NN):
 			tf.contrib.layers.flatten(layers[-1]),
 			hidden_size,
 			weights_regularizer=regularizer)
-		if self.config.val_dropout != None:
+		if self.config.val_keep_prob != None:
 			dropout = tf.contrib.layers.dropout(
 				hidden,
 				self.config.val_keep_prob,
