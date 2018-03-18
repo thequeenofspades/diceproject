@@ -11,7 +11,7 @@ class ValueNN(NN):
 		layers = [self.X_placeholder]
 		layer_sizes = self.config.val_layer_sizes
 		filter_sizes = self.config.val_filter_sizes
-		hidden_size = self.config_val_hidden_size
+		hidden_size = self.config.val_hidden_size
 		for i in range(self.config.val_layers):
 			conv_layer = tf.contrib.layers.conv2d(
 				layers[i - 1],
