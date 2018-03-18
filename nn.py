@@ -28,7 +28,7 @@ class NN:
 		loss = tf.nn.sparse_softmax_cross_entropy_with_logits(
 			logits=self.output,
 			labels=self.Y_placeholder)
-		self.loss = tf.reduce_mean(loss) + tf.get_regularization_loss()
+		self.loss = tf.reduce_mean(loss) + tf.losses.get_regularization_loss()
 
 	def accuracy(self, preds, Y):
 		preds = np.argmax(preds, 1)
