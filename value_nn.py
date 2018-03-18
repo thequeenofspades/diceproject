@@ -19,6 +19,7 @@ class ValueNN(NN):
 				2)
 			norm_layer = tf.contrib.layers.batch_norm(
 				pool_layer,
+				decay=0.9,
 				updates_collections=None,
 				is_training=self.dropout_placeholder)
 			layers.append(norm_layer)
