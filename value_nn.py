@@ -86,13 +86,6 @@ class ValueNN(NN):
 				activation=None)
 			self.preds = tf.nn.softmax(self.output)
 
-	def add_loss(self):
-		loss = tf.nn.sparse_softmax_cross_entropy_with_logits(
-			logits=self.output,
-			labels=self.Y_placeholder)
-		reg_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
-		self.loss = tf.reduce_mean(loss) + self.config.val_lamb * tf.reduce_sum(reg_losses)
-
 	def add_train_op(self):
 		optimizer = tf.train.AdamOptimizer(learning_rate=self.config.val_lr)
 		if self.config.val_use_batch_norm:
