@@ -33,8 +33,10 @@ class config():
 	val_lamb = 0.1
 	val_keep_prob = 0.8
 	val_lr = 0.01
+	val_norm_decay = 0.9
 	val_layers = 5
 	val_layer_sizes = [16, 32, 64, 128, 512]
 	val_filter_sizes = [11, 9, 7, 5, 3]
+	val_hidden_size = 512
 	val_save_path = 'val/'
 	val_weights_to_restore = None

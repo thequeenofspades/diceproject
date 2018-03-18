@@ -4,10 +4,14 @@ from nn import NN
 
 class ValueNN(NN):
 	def network(self):
-		regularizer = tf.contrib.layers.l2_regularizer(scale=self.config.val_lamb)
+		if self.config.val_lamb != None:	
+			regularizer = tf.contrib.layers.l2_regularizer(scale=self.config.val_lamb)
+		else:
+			regularizer = None
 		layers = [self.X_placeholder]
 		layer_sizes = self.config.val_layer_sizes
 		filter_sizes = self.config.val_filter_sizes
+		hidden_size = self.config_val_hidden_size
 		for i in range(self.config.val_layers):
 			conv_layer = tf.contrib.layers.conv2d(
 				layers[i - 1],
@@ -19,18 +23,21 @@ class ValueNN(NN):
 				2)
 			norm_layer = tf.contrib.layers.batch_norm(
 				pool_layer,
-				decay=0.9,
+				decay=self.config.val_norm_decay,
 				updates_collections=None,
 				is_training=self.dropout_placeholder)
 			layers.append(norm_layer)
 		hidden = tf.contrib.layers.fully_connected(
 			tf.contrib.layers.flatten(layers[-1]),
-			512,
+			hidden_size,
 			weights_regularizer=regularizer)
-		dropout = tf.contrib.layers.dropout(
-			hidden,
-			self.config.val_keep_prob,
-			is_training=self.dropout_placeholder)
+		if self.config.val_dropout != None:
+			dropout = tf.contrib.layers.dropout(
+				hidden,
+				self.config.val_keep_prob,
+				is_training=self.dropout_placeholder)
+		else:
+			dropout = hidden
 		self.output = tf.contrib.layers.fully_connected(
 			hidden,
 			self.config.val_num_classes,
