@@ -19,6 +19,7 @@ class ValueNN(NN):
 				2)
 			norm_layer = tf.contrib.layers.batch_norm(
 				pool_layer,
+				updates_collections=None,
 				is_training=self.dropout_placeholder)
 			layers.append(norm_layer)
 		hidden = tf.contrib.layers.fully_connected(
