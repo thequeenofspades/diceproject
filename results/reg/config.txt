@@ -1,8 +1,0 @@
-3 layers
-16, 32, 64
-7, 5, 3
-lambda=0.1
-no dropout
-img size 100
-batches 30000
-lr=0.001
