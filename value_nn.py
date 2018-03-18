@@ -56,6 +56,11 @@ class ValueNN(NN):
 					hidden,
 					momentum=self.config.val_norm_decay,
 					training=self.dropout_placeholder)
+			if self.config.val_keep_prob != None:
+				dropout = tf.contrib.layers.dropout(
+					hidden,
+					self.config.val_keep_prob,
+					is_training=self.dropout_placeholder)
 			hidden = tf.nn.relu(hidden)
 			# if self.config.val_keep_prob != None:
 			# 	dropout = tf.layers.dropout(
