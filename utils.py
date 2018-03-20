@@ -67,6 +67,7 @@ def load_train_data(img_path, label_path, mode='val'):
 	print "Processing images..."
 	imgs, data_center = process_image(imgs)
 	#preview_imgs(imgs, 20)
+	imgs = np.array([np.array(img).reshape(config.img_size, config.img_size, config.n_channels) for img in imgs])
 	labels = np.array(labels)
 	return imgs, labels, data_center
 
@@ -76,6 +77,7 @@ def load_dev_data(img_path, label_path, data_center, mode='val'):
 	print "Resizing and processing images..."
 	imgs = resize_imgs(imgs)
 	imgs = process_image(imgs, [data_center])
+	imgs = np.array([np.array(img).reshape(config.img_size, config.img_size, config.n_channels) for img in imgs])
 	labels = np.array(labels)
 	return imgs, labels
 
@@ -133,7 +135,7 @@ def preview_imgs(imgs, n=10):
 		print np.array(img).reshape(config.img_size, config.img_size, config.n_channels)
 		img.show()
 
-def process_image(imgs, data_center=None):
+def process_image(imgs, data_center = None):
 	new_imgs = [img.convert('L') for img in imgs]
 	new_imgs = np.array([np.array(img).reshape(config.img_size, config.img_size, config.n_channels) for img in new_imgs])
 	if data_center == None:
