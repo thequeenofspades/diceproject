@@ -31,6 +31,8 @@ def augment(imgs, labels):
 	new_imgs = []
 	new_labels = []
 	for i in range(len(imgs)):
+		new_imgs.append(imgs[i])
+		new_labels.append(labels[i])
 		for j in range(4):
 			x1 = random.randint(0, imgs[i].width / 5)
 			y1 = random.randint(0, imgs[i].height / 5)
