@@ -2,30 +2,35 @@ import numpy as np
 from value_nn import ValueNN
 from config import config
 from utils import load_train_data, load_dev_data
+import cPickle as pickle
+from os import listdir
 
 img_path = 'examples/images/'
 label_path = 'examples/labels/'
-loss_path = 'losses_val.txt'
-eval_path = 'eval_val.txt'
+loss_path_pkl = 'losses_val.pkl'
+eval_path_pkl = 'eval_val.pkl'
 
-def train(nn, X, Y, batches, losses):
-	loss_file = open(loss_path, 'a+')
+def train(nn, X, Y, batches, losses, losses_pkl={}):
+	loss_file_pkl = open(loss_path_pkl, 'wb')
 	losses, steps = nn.train(X, Y, batches, losses)
 	losses = losses[-len(steps):]
 	for i in range(len(losses)):
-		loss_file.write('%d %f\n' % (steps[i], losses[i]))
-	loss_file.close()
-	return losses[-100:], steps[-1]
+		losses_pkl[steps[i]] = losses[i]
+	pickle.dump(losses_pkl, loss_file_pkl, pickle.HIGHEST_PROTOCOL)
+	loss_file_pkl.close()
+	return losses[-100:], steps[-1], losses_pkl
 
-def eval(nn, X_train, Y_train, X_dev, Y_dev, step):
+def eval(nn, X_train, Y_train, X_dev, Y_dev, step, eval_pkl={}):
 	print "Evaluating..."
-	eval_file = open(eval_path, 'a+')
+	eval_file_pkl = open(eval_path_pkl, 'wb')
 	_, train_acc = nn.validate(X_train, Y_train)
 	_, dev_acc = nn.validate(X_dev, Y_dev)
-	eval_file.write('%d %f %f\n' % (step, train_acc, dev_acc))
-	eval_file.close()
+	eval_pkl[step] = [train_acc, dev_acc]
+	pickle.dump(eval_pkl, eval_file_pkl, pickle.HIGHEST_PROTOCOL)
+	eval_file_pkl.close()
 	print "Train accuracy: %f" % train_acc
 	print "Dev accuracy: %f" % dev_acc
+	return train_acc, dev_acc, eval_pkl
 
 if __name__ == '__main__':
 	nn = ValueNN(config)
@@ -34,6 +39,25 @@ if __name__ == '__main__':
 
 	times_to_eval = int(config.batches / config.eval_freq)
 	losses = []
+	best_dev_acc = 0.0
+	best_dev_acc_step = 0
+	if loss_path_pkl in listdir('.'):
+		loss_file = open(loss_path_pkl, 'rb')
+		losses_pkl = pickle.load(loss_file)
+		loss_file.close()
+	else:
+		losses_pkl = {}
+	if eval_path_pkl in listdir('.'):
+		eval_file = open(eval_path_pkl, 'rb')
+		eval_pkl = pickle.load(eval_file)
+		eval_file.close()
+	else:
+		eval_pkl = {}
 	for i in range(times_to_eval):
-		losses, step = train(nn, X_train, Y_train, config.eval_freq, losses)
-		eval(nn, X_train, Y_train, X_dev, Y_dev, step)
+		losses, step, losses_pkl = train(nn, X_train, Y_train, config.eval_freq, losses, losses_pkl)
+		train_acc, dev_acc, eval_pkl = eval(nn, X_train, Y_train, X_dev, Y_dev, step, eval_pkl)
+		if dev_acc > best_dev_acc:
+			best_dev_acc = dev_acc
+			best_dev_acc_step = step
+			nn.save()
+	print "Best dev accuracy: %f (step %d)" % (best_dev_acc, best_dev_acc_step)

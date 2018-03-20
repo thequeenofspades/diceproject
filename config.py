@@ -2,7 +2,7 @@ class config():
 	#Data params
 	dev_frac = 0.1
 	test_frac = 0.05
-	img_size = 100
+	img_size = 128
 	n_channels = 1
 
 	#Training params
@@ -30,15 +30,16 @@ class config():
 						11: 10, 12: 11, 13: 12, 14: 13, 15: 14, 16: 15, 17: 16,
 						18: 17, 19: 18, 20: 19}
 	val_num_classes = 20
-	val_lamb = 0.1
-	val_keep_prob = 0.8
+	val_lamb = 0.0
+	val_keep_prob = 1.0
 	val_lr = 0.01
 	val_norm_decay = 0.9
-	val_conv_layers = 3
+	val_conv_layers = 1
 	val_fc_layers = 1
-	val_layer_sizes = [16,32,64]#[16, 32, 64, 128, 512]
-	val_filter_sizes = [5,5,5]#[11, 9, 7, 5, 3]
-	val_fc_sizes = [1024]
+	val_layer_sizes = [64]#[16,32,64]#[16, 32, 64, 128, 512]
+	val_filter_sizes = [3]#[5,5,5]#[11, 9, 7, 5, 3]
+	val_strides = [2]#[2,2,2]
+	val_fc_sizes = [512]
 	val_use_batch_norm = True
 	val_save_path = 'val/'
 	val_weights_to_restore = None

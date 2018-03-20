@@ -1,27 +1,22 @@
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
+import cPickle as pickle
 
 if __name__ == '__main__':
-	save_path = 'results/reg/'
-	eval_file = open(save_path + 'eval_val.txt', 'r')
-	losses_file = open(save_path + 'losses_val.txt', 'r')
-	eval_batch = []
+	save_path = 'results/4/'
+	evals_pkl = pickle.load(open(save_path + 'eval_val.pkl', 'rb'))
+	losses_pkl = pickle.load(open(save_path + 'losses_val.pkl', 'rb'))
+	evals_batch = sorted(evals_pkl.keys())
+	losses_batch = sorted(losses_pkl.keys())
+	losses = []
 	train_eval = []
 	dev_eval = []
-	losses = []
-	losses_batch = []
-	for line in eval_file:
-		batch, train_acc, dev_acc = line.split()
-		eval_batch.append(int(batch))
-		train_eval.append(float(train_acc))
-		dev_eval.append(float(dev_acc))
-	eval_file.close()
-	for line in losses_file:
-		batch, loss = line.split()
-		losses_batch.append(int(batch))
-		losses.append(float(loss))
-	losses_file.close()
+	for i in losses_batch:
+		losses.append(losses_pkl[i])
+	for i in evals_batch:
+		train_eval.append(evals_pkl[i][0])
+		dev_eval.append(evals_pkl[i][1])
 
 	# Plot accuracy
 	train_accs, = plt.plot(eval_batch, train_eval, label='Train accuracy')

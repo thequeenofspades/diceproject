@@ -12,6 +12,7 @@ class ValueNN(NN):
 					layers[i],
 					self.config.val_layer_sizes[i],
 					self.config.val_filter_sizes[i],
+					strides=self.config.val_strides[i],
 					padding='same',
 					kernel_initializer=tf.contrib.layers.xavier_initializer(),
 					kernel_regularizer=regularizer)
@@ -37,11 +38,10 @@ class ValueNN(NN):
 						out,
 						momentum=self.config.val_norm_decay,
 						training=self.dropout_placeholder)
-				if self.config.val_keep_prob != None:
-					out = tf.contrib.layers.dropout(
-						out,
-						self.config.val_keep_prob,
-						is_training=self.dropout_placeholder)
+				out = tf.contrib.layers.dropout(
+					out,
+					self.config.val_keep_prob,
+					is_training=self.dropout_placeholder)
 				out = tf.nn.relu(out)
 		with tf.variable_scope('fc2'):
 			self.output = tf.layers.dense(
@@ -62,7 +62,7 @@ class ValueNN(NN):
 			self.train_op = optimizer.minimize(self.loss, global_step=self.global_step)
 
 	def setup(self):
-		self.saver = tf.train.Saver(max_to_keep=None)
+		self.saver = tf.train.Saver(max_to_keep=1)
 		ckpt = tf.train.get_checkpoint_state(self.config.save_path + self.config.val_save_path)
 		if ckpt and ckpt.model_checkpoint_path:
 			model_checkpoint_path = ckpt.model_checkpoint_path
@@ -76,7 +76,7 @@ class ValueNN(NN):
 			self.sess.run(init)
 
 	def save(self):
-		print('Saving to {} with global step {}'.format(self.config.save_path + self.config.val_save_path + 'model_step.ckpt', tf.train.global_step(self.sess, self.global_step)))
+		print('New best dev accuracy! Saving to {} with global step {}'.format(self.config.save_path + self.config.val_save_path + 'model_step.ckpt', tf.train.global_step(self.sess, self.global_step)))
 		self.saver.save(self.sess, self.config.save_path + self.config.val_save_path + 'model_step.ckpt', global_step=self.global_step)
 
 	def predict(self, X):
