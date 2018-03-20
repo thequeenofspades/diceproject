@@ -58,7 +58,7 @@ if __name__ == '__main__':
 	for i in range(times_to_eval):
 		losses, step, losses_pkl = train(nn, X_train, Y_train, config.eval_freq, losses, losses_pkl)
 		train_acc, dev_acc, eval_pkl = eval(nn, orig_X_train, orig_Y_train, X_dev, Y_dev, step, eval_pkl)
-		if dev_acc > best_dev_acc:
+		if dev_acc >= best_dev_acc:
 			best_dev_acc = dev_acc
 			best_dev_acc_step = step
 			nn.save()
