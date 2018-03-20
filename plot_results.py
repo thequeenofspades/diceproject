@@ -4,17 +4,17 @@ import matplotlib.pyplot as plt
 import cPickle as pickle
 
 if __name__ == '__main__':
-	save_path = 'results/4/'
+	save_path = 'results/5/'
 	evals_pkl = pickle.load(open(save_path + 'eval_val.pkl', 'rb'))
 	losses_pkl = pickle.load(open(save_path + 'losses_val.pkl', 'rb'))
-	evals_batch = sorted(evals_pkl.keys())
+	eval_batch = sorted(evals_pkl.keys())
 	losses_batch = sorted(losses_pkl.keys())
 	losses = []
 	train_eval = []
 	dev_eval = []
 	for i in losses_batch:
 		losses.append(losses_pkl[i])
-	for i in evals_batch:
+	for i in eval_batch:
 		train_eval.append(evals_pkl[i][0])
 		dev_eval.append(evals_pkl[i][1])
 
