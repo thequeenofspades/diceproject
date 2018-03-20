@@ -77,7 +77,7 @@ class NN:
 			batch_nums.append(tf.train.global_step(self.sess, self.global_step))
 			avg_loss = sum(losses[-100:]) / len(losses[-100:])
 			if (step + 1) % self.config.print_freq == 0:
-				print "batch: %d, loss: %f, avg loss: %f, accuracy: %f" % (batch_nums[-1], loss, avg_loss, self.accuracy(preds, Y[idx]))
+				print "batch: %d, loss: %f, avg loss: %f, accuracy: %f" % (batch_nums[-1], loss, avg_loss, self.accuracy(preds, Y))
 				preds = np.argmax(preds, 1)
 				print "predictions: %s" % str(preds)
 		return losses, batch_nums
