@@ -96,7 +96,7 @@ def convert_label(img, label, fm='yolo', img_fm=None):
 
 def load_train_data(img_path, label_path, mode='val', exclude=[]):
 	print "Loading image and label data from train..."
-	imgs, orig_labels = load_data(img_path, label_path, 'train.txt', mode, exclude)
+	imgs, orig_labels, type_labels = load_data(img_path, label_path, 'train.txt', mode, exclude)
 	print "Resizing images..."
 	orig_imgs = resize_imgs(imgs)
 	print "Augmenting images..."
@@ -107,31 +107,32 @@ def load_train_data(img_path, label_path, mode='val', exclude=[]):
 	#preview_imgs(imgs, 20)
 	labels = np.array(labels)
 	print "After augmentation: %d examples" % labels.shape[0]
-	return imgs, labels, data_center, orig_imgs, orig_labels
+	return imgs, labels, data_center, orig_imgs, orig_labels, type_labels
 
 def load_dev_data(img_path, label_path, data_center, mode='val', exclude=[]):
 	print "Loading image and label data from dev..."
-	imgs, labels = load_data(img_path, label_path, 'dev.txt', mode, exclude)
+	imgs, labels, type_labels = load_data(img_path, label_path, 'dev.txt', mode, exclude)
 	print "Resizing and processing images..."
 	imgs = resize_imgs(imgs)
 	imgs, _ = process_image(imgs, [data_center])
 	labels = np.array(labels)
-	return imgs, labels
+	return imgs, labels, type_labels
 
 def load_test_data(img_path, label_path, mode='val', exclude=[]):
 	print "Loading image and label data from test..."
-	imgs, labels = load_data(img_path, label_path, 'test.txt', mode, exclude)
+	imgs, labels, type_labels = load_data(img_path, label_path, 'test.txt', mode, exclude)
 	print "Resizing and processing images..."
 	imgs = resize_imgs(imgs)
 	imgs, _ = process_image(imgs)
 	imgs = np.array([np.array(img).reshape(config.img_size, config.img_size, config.n_channels) for img in imgs])
 	labels = np.array(labels)
-	return imgs, labels
+	return imgs, labels, type_labels
 
 def load_data(img_path, label_path, path, mode='val', exclude=[]):
 	data_file = open(path, 'r')
 	imgs = []
 	labels = []
+	type_labels = []
 	for line in data_file:
 		img_name = line.split()[0]
 		img = Image.open(img_path + img_name + '.jpg')
@@ -147,9 +148,10 @@ def load_data(img_path, label_path, path, mode='val', exclude=[]):
 		elif mode == 'type':
 			labels.append(config.type_class_mapping[int(label[0])])
 			imgs.append(img)
+		type_labels.append(config.type_class_mapping[int(label[0])])
 	data_file.close()
 	analyze_labels(labels)
-	return imgs, labels
+	return imgs, labels, type_labels
 
 def nms(bboxes):
 	nms_bboxes = []

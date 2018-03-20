@@ -34,8 +34,8 @@ def eval(nn, X_train, Y_train, X_dev, Y_dev, step, eval_pkl={}):
 
 if __name__ == '__main__':
 	nn = ValueNN(config)
-	X_train, Y_train, data_center, orig_X_train, orig_Y_train = load_train_data(img_path, label_path, 'val', config.exclude)
-	X_dev, Y_dev = load_dev_data(img_path, label_path, data_center, 'val', config.exclude)
+	X_train, Y_train, data_center, orig_X_train, orig_Y_train, _ = load_train_data(img_path, label_path, 'val', config.exclude)
+	X_dev, Y_dev, _ = load_dev_data(img_path, label_path, data_center, 'val', config.exclude)
 
 	times_to_eval = int(config.batches / config.eval_freq)
 	losses = []
