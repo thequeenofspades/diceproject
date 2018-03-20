@@ -34,13 +34,35 @@ def augment(imgs, labels):
 		new_imgs.append(imgs[i])
 		new_labels.append(labels[i])
 		for j in range(4):
-			x1 = random.randint(0, imgs[i].width / 5)
-			y1 = random.randint(0, imgs[i].height / 5)
-			max_size = min(imgs[i].width - x1, imgs[i].height - y1)
-			min_size = max(3 * imgs[i].width / 5 - x1, 3 * imgs[i].height / 5 - y1)
-			size = random.randint(min_size, max_size)
-			new_img = imgs[i].crop((x1, y1, x1 + size, y1 + size))
+			x1 = random.randint(-(imgs[i].width / 5), imgs[i].width / 5)
+			y1 = random.randint(-(imgs[i].height / 5), imgs[i].height / 5)
+			x2 = random.randint(4 * imgs[i].width / 5, 6 * imgs[i].width / 5)
+			y2 = y1 + (x2 - x1)
+			borders = [0,0,0,0]
+			if x1 < 0:
+				borders[0] = -x1
+			if y1 < 0:
+				borders[1] = -y1
+			if x2 > imgs[i].width + 1:
+				borders[2] = x2 - (imgs[i].width + 1)
+			if y2 > imgs[i].height + 1:
+				borders[3] = y2 - (imgs[i].height + 1)
+			new_img = ImageOps.expand(im, borders)
+			assert new_img.height == new_img.width
+			x1 = x1 + borders[0]
+			y1 = y1 + borders[1]
+			x2 = x2 + borders[0]
+			y2 = y2 + borders[1]
+			new_img = new_img.crop((x1, y1, x2, y2))
+			assert new_img.height == new_img.width
 			new_img = new_img.resize((config.img_size, config.img_size))
+			# max_size = min((6 * imgs[i].width / 5) - x1, (6 * imgs[i].height / 5) - y1)
+			# min_size = max(3 * imgs[i].width / 5 - x1, 3 * imgs[i].height / 5 - y1)
+			# size = random.randint(min_size, max_size)
+			# x2 = x1 + size
+			# y2 = y1 + size
+			# new_img = imgs[i].crop((x1, y1, x1 + size, y1 + size))
+			# new_img = new_img.resize((config.img_size, config.img_size))
 			new_imgs.append(new_img)
 			new_labels.append(labels[i])
 	return new_imgs, new_labels
