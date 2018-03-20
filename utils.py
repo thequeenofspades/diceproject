@@ -8,6 +8,7 @@ from config import config
 import random
 
 def analyze_labels(labels):
+	print "%d examples" % len(labels)
 	counts = {}
 	for label in labels:
 		value = label
@@ -57,9 +58,9 @@ def convert_label(img, label, fm='yolo', img_fm=None):
 		height = (y_end - y_start) / float(img_height)
 		return [x, y, width, height]
 
-def load_train_data(img_path, label_path, mode='val'):
+def load_train_data(img_path, label_path, mode='val', exclude=[]):
 	print "Loading image and label data from train..."
-	imgs, labels = load_data(img_path, label_path, 'train.txt', mode)
+	imgs, labels = load_data(img_path, label_path, 'train.txt', mode, exclude)
 	print "Resizing images..."
 	imgs = resize_imgs(imgs)
 	print "Augmenting images..."
@@ -70,18 +71,18 @@ def load_train_data(img_path, label_path, mode='val'):
 	labels = np.array(labels)
 	return imgs, labels, data_center
 
-def load_dev_data(img_path, label_path, data_center, mode='val'):
+def load_dev_data(img_path, label_path, data_center, mode='val', exclude=[]):
 	print "Loading image and label data from dev..."
-	imgs, labels = load_data(img_path, label_path, 'dev.txt', mode)
+	imgs, labels = load_data(img_path, label_path, 'dev.txt', mode, exclude)
 	print "Resizing and processing images..."
 	imgs = resize_imgs(imgs)
 	imgs, _ = process_image(imgs, [data_center])
 	labels = np.array(labels)
 	return imgs, labels
 
-def load_test_data(img_path, label_path, mode='val'):
+def load_test_data(img_path, label_path, mode='val', exclude=[]):
 	print "Loading image and label data from test..."
-	imgs, labels = load_data(img_path, label_path, 'test.txt', mode)
+	imgs, labels = load_data(img_path, label_path, 'test.txt', mode, exclude)
 	print "Resizing and processing images..."
 	imgs = resize_imgs(imgs)
 	imgs, _ = process_image(imgs)
@@ -89,7 +90,7 @@ def load_test_data(img_path, label_path, mode='val'):
 	labels = np.array(labels)
 	return imgs, labels
 
-def load_data(img_path, label_path, path, mode='val'):
+def load_data(img_path, label_path, path, mode='val', exclude=[]):
 	data_file = open(path, 'r')
 	imgs = []
 	labels = []
@@ -102,7 +103,9 @@ def load_data(img_path, label_path, path, mode='val'):
 		label = [line for line in label_file][0].split()
 		label_file.close()
 		if mode == 'val':
-			label = config.val_class_mapping[int(label[1])]
+			die_type = int(label[0])
+			if die_type not in exclude:
+				label = config.val_class_mapping[int(label[1])]
 		elif mode == 'type':
 			label = config.type_class_mapping[int(label[0])]
 		labels.append(label)
