@@ -52,7 +52,7 @@ if __name__ == '__main__':
 	dev_preds, dev_acc = nn.validate(X_dev, Y_dev)
 
 	print "Train accuracy: %f" % train_acc
-	analyze_errors(Y_train, train_preds, type_labels_train)
+	analyze_errors(orig_Y_train, train_preds, type_labels_train)
 	print "Dev accuracy: %f" % dev_acc
 	analyze_errors(Y_dev, dev_preds, type_labels_dev)
 
