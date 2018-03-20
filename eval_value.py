@@ -8,6 +8,7 @@ label_path = 'examples/labels/'
 eval_test = False
 
 def analyze_errors(labels, preds, type_labels):
+	assert labels.shape[0] == len(type_labels) == preds.shape[0]
 	count_by_label = {}
 	correct_by_label = {}
 	count_by_type = {}
