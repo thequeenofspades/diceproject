@@ -14,42 +14,26 @@ class ValueNN(NN):
 		hidden_size = self.config.val_hidden_size
 		for i in range(self.config.val_layers):
 			with tf.variable_scope('block_{}'.format(i+1)):
-				# conv_layer = tf.contrib.layers.conv2d(
-				# 	layers[i - 1],
-				# 	layer_sizes[i],
-				# 	filter_sizes[i],
-				# 	weights_regularizer=regularizer)
 				out = tf.layers.conv2d(
 					layers[i - 1],
 					layer_sizes[i],
 					filter_sizes[i],
 					padding='same',
+					kernel_initializer=tf.contrib.layers.xavier_initializer(),
 					kernel_regularizer=regularizer)
-
-				# pool_layer = tf.contrib.layers.max_pool2d(
-				# 	conv_layer,
-				# 	2)
 				if self.config.val_use_batch_norm:
 					out = tf.layers.batch_normalization(
 						out,
 						momentum=self.config.val_norm_decay,
 						training=self.dropout_placeholder)
-				# norm_layer = tf.contrib.layers.batch_norm(
-				# 	pool_layer,
-				# 	decay=self.config.val_norm_decay,
-				# 	updates_collections=None,
-				# 	is_training=self.dropout_placeholder)
 				out = tf.nn.relu(out)
 				out = tf.layers.max_pooling2d(out, 2, 2)
 				layers.append(out)
-		# hidden = tf.contrib.layers.fully_connected(
-		# 	tf.contrib.layers.flatten(layers[-1]),
-		# 	hidden_size,
-		# 	weights_regularizer=regularizer)
 		with tf.variable_scope('fc1'):
 			hidden = tf.layers.dense(
 				tf.contrib.layers.flatten(layers[-1]),
 				hidden_size,
+				kernel_initializer=tf.contrib.layers.xavier_initializer(),
 				kernel_regularizer=regularizer)
 			if self.config.val_use_batch_norm:
 				hidden = tf.layers.batch_normalization(
@@ -62,26 +46,11 @@ class ValueNN(NN):
 					self.config.val_keep_prob,
 					is_training=self.dropout_placeholder)
 			hidden = tf.nn.relu(hidden)
-			# if self.config.val_keep_prob != None:
-			# 	dropout = tf.layers.dropout(
-			# 		hidden,
-			# 		1. - self.config.val_keep_prob,
-			# 		training=self.dropout_placeholder)
-			# 	# dropout = tf.contrib.layers.dropout(
-			# 	# 	hidden,
-			# 	# 	self.config.val_keep_prob,
-			# 	# 	is_training=self.dropout_placeholder)
-			# else:
-			# 	dropout = hidden
-		# self.output = tf.contrib.layers.fully_connected(
-		# 	hidden,
-		# 	self.config.val_num_classes,
-		# 	weights_regularizer=regularizer,
-		# 	activation_fn=None)
 		with tf.variable_scope('fc2'):
 			self.output = tf.layers.dense(
 				hidden,
 				self.config.val_num_classes,
+				kernel_initializer=tf.contrib.layers.xavier_initializer(),
 				kernel_regularizer=regularizer,
 				activation=None)
 			self.preds = tf.nn.softmax(self.output)
