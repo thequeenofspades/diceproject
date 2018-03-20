@@ -67,7 +67,6 @@ def load_train_data(img_path, label_path, mode='val'):
 	print "Processing images..."
 	imgs, data_center = process_image(imgs)
 	#preview_imgs(imgs, 20)
-	imgs = np.array([np.array(img).reshape(config.img_size, config.img_size, config.n_channels) for img in imgs])
 	labels = np.array(labels)
 	return imgs, labels, data_center
 
@@ -76,8 +75,7 @@ def load_dev_data(img_path, label_path, data_center, mode='val'):
 	imgs, labels = load_data(img_path, label_path, 'dev.txt', mode)
 	print "Resizing and processing images..."
 	imgs = resize_imgs(imgs)
-	imgs = process_image(imgs, [data_center])
-	imgs = np.array([np.array(img).reshape(config.img_size, config.img_size, config.n_channels) for img in imgs])
+	imgs, _ = process_image(imgs, [data_center])
 	labels = np.array(labels)
 	return imgs, labels
 
@@ -86,7 +84,7 @@ def load_test_data(img_path, label_path, mode='val'):
 	imgs, labels = load_data(img_path, label_path, 'test.txt', mode)
 	print "Resizing and processing images..."
 	imgs = resize_imgs(imgs)
-	imgs = process_image(imgs)
+	imgs, _ = process_image(imgs)
 	imgs = np.array([np.array(img).reshape(config.img_size, config.img_size, config.n_channels) for img in imgs])
 	labels = np.array(labels)
 	return imgs, labels
