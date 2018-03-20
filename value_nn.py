@@ -23,7 +23,7 @@ class ValueNN(NN):
 				out = tf.nn.relu(out)
 				out = tf.layers.max_pooling2d(out, 2, 2)
 				layers.append(out)
-		out_flat = tf.reshape(layers[-1], (-1, (self.config.img_size / (2*self.config.val_conv_layers))**2 * self.config.n_channels))
+		out_flat = tf.contrib.layers.flatten(layers[-1])
 		layers = [out_flat]
 		for i in range(self.config.val_fc_layers):
 			with tf.variable_scope('fc_{}'.format(i+1)):
