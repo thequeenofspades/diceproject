@@ -24,7 +24,7 @@ class NN:
 		self.minibatch_idx = None
 		self.minibatches = []
 
-	def global_step(self):
+	def get_global_step(self):
 		return tf.train.global_step(self.sess, self.global_step)
 
 	def add_placeholders(self):
