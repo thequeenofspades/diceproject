@@ -105,10 +105,9 @@ def load_data(img_path, label_path, path, mode='val', exclude=[]):
 		if mode == 'val':
 			die_type = int(label[0])
 			if die_type not in exclude:
-				label = config.val_class_mapping[int(label[1])]
+				labels.append(config.val_class_mapping[int(label[1])])
 		elif mode == 'type':
-			label = config.type_class_mapping[int(label[0])]
-		labels.append(label)
+			labels.append(config.type_class_mapping[int(label[0])])
 	data_file.close()
 	analyze_labels(labels)
 	return imgs, labels
