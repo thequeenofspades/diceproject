@@ -4,20 +4,14 @@ from nn import NN
 
 class ValueNN(NN):
 	def network(self):
-		if self.config.val_lamb != None:	
-			regularizer = tf.contrib.layers.l2_regularizer(scale=self.config.val_lamb)
-		else:
-			regularizer = None
+		regularizer = tf.contrib.layers.l2_regularizer(scale=self.config.val_lamb)
 		layers = [self.X_placeholder]
-		layer_sizes = self.config.val_layer_sizes
-		filter_sizes = self.config.val_filter_sizes
-		hidden_size = self.config.val_hidden_size
-		for i in range(self.config.val_layers):
+		for i in range(self.config.val_conv_layers):
 			with tf.variable_scope('block_{}'.format(i+1)):
 				out = tf.layers.conv2d(
-					layers[i - 1],
-					layer_sizes[i],
-					filter_sizes[i],
+					layers[i],
+					self.config.val_layer_sizes[i],
+					self.config.val_filter_sizes[i],
 					padding='same',
 					kernel_initializer=tf.contrib.layers.xavier_initializer(),
 					kernel_regularizer=regularizer)
@@ -29,27 +23,29 @@ class ValueNN(NN):
 				out = tf.nn.relu(out)
 				out = tf.layers.max_pooling2d(out, 2, 2)
 				layers.append(out)
-		out_flat = tf.reshape(layers[-1], (-1, self.config.img_size**2 * self.config.n_channels))
-		with tf.variable_scope('fc1'):
-			hidden = tf.layers.dense(
-				out_flat,
-				hidden_size,
-				kernel_initializer=tf.contrib.layers.xavier_initializer(),
-				kernel_regularizer=regularizer)
-			if self.config.val_use_batch_norm:
-				hidden = tf.layers.batch_normalization(
-					hidden,
-					momentum=self.config.val_norm_decay,
-					training=self.dropout_placeholder)
-			if self.config.val_keep_prob != None:
-				dropout = tf.contrib.layers.dropout(
-					hidden,
-					self.config.val_keep_prob,
-					is_training=self.dropout_placeholder)
-			hidden = tf.nn.relu(hidden)
+		out_flat = tf.reshape(layers[-1], (-1, (self.config.img_size / (2*self.config.val_conv_layers))**2 * self.config.n_channels))
+		layers = [out_flat]
+		for i in range(self.config.val_fc_layers):
+			with tf.variable_scope('fc_{}'.format(i+1)):
+				out = tf.layers.dense(
+					layers[i],
+					self.config.val_fc_sizes[i],
+					kernel_initializer=tf.contrib.layers.xavier_initializer(),
+					kernel_regularizer=regularizer)
+				if self.config.val_use_batch_norm:
+					out = tf.layers.batch_normalization(
+						out,
+						momentum=self.config.val_norm_decay,
+						training=self.dropout_placeholder)
+				if self.config.val_keep_prob != None:
+					out = tf.contrib.layers.dropout(
+						out,
+						self.config.val_keep_prob,
+						is_training=self.dropout_placeholder)
+				out = tf.nn.relu(out)
 		with tf.variable_scope('fc2'):
 			self.output = tf.layers.dense(
-				hidden,
+				layers[-1],
 				self.config.val_num_classes,
 				kernel_initializer=tf.contrib.layers.xavier_initializer(),
 				kernel_regularizer=regularizer,

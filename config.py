@@ -34,10 +34,11 @@ class config():
 	val_keep_prob = 0.8
 	val_lr = 0.01
 	val_norm_decay = 0.9
-	val_layers = 3
+	val_conv_layers = 3
+	val_fc_layers = 1
 	val_layer_sizes = [16,32,64]#[16, 32, 64, 128, 512]
 	val_filter_sizes = [5,5,5]#[11, 9, 7, 5, 3]
-	val_hidden_size = 1024
+	val_fc_sizes = [1024]
 	val_use_batch_norm = True
 	val_save_path = 'val/'
 	val_weights_to_restore = None
