@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import random
 
 class NN:
 	def __init__(self, config):
