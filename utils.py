@@ -48,7 +48,6 @@ def augment(imgs, labels):
 			if y2 > imgs[i].height + 1:
 				borders[3] = y2 - (imgs[i].height + 1)
 			new_img = ImageOps.expand(imgs[i], tuple(borders))
-			assert new_img.height == new_img.width
 			x1 = x1 + borders[0]
 			y1 = y1 + borders[1]
 			x2 = x2 + borders[0]
