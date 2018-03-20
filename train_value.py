@@ -39,8 +39,6 @@ if __name__ == '__main__':
 
 	times_to_eval = int(config.batches / config.eval_freq)
 	losses = []
-	best_dev_acc = 0.0
-	best_dev_acc_step = 0
 	if loss_path_pkl in listdir('.'):
 		loss_file = open(loss_path_pkl, 'rb')
 		losses_pkl = pickle.load(loss_file)
@@ -53,6 +51,10 @@ if __name__ == '__main__':
 		eval_file.close()
 	else:
 		eval_pkl = {}
+
+	_, best_dev_acc, _ = eval(nn, X_train, Y_train, X_dev, Y_dev, 0, eval_pkl)
+	best_dev_acc_step = 0
+	
 	for i in range(times_to_eval):
 		losses, step, losses_pkl = train(nn, X_train, Y_train, config.eval_freq, losses, losses_pkl)
 		train_acc, dev_acc, eval_pkl = eval(nn, X_train, Y_train, X_dev, Y_dev, step, eval_pkl)
