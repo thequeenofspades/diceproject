@@ -40,7 +40,7 @@ def analyze_errors(labels, preds, type_labels):
 		acc_by_label[label] = correct / float(count_by_label[label])
 	for label in count_by_type:
 		correct = 0
-		if label in correct_by_type[label]:
+		if label in correct_by_type:
 			correct = correct_by_type[label]
 		acc_by_type[label] = correct / float(count_by_type[label])
 	print "Accuracy by value: %s" % str(acc_by_label)
