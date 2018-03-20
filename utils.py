@@ -60,13 +60,13 @@ def convert_label(img, label, fm='yolo', img_fm=None):
 def load_train_data(img_path, label_path, mode='val'):
 	print "Loading image and label data from train..."
 	imgs, labels = load_data(img_path, label_path, 'train.txt', mode)
-	print "Resizing and processing images..."
+	print "Resizing images..."
 	imgs = resize_imgs(imgs)
-	imgs, data_center = process_image(imgs)
 	print "Augmenting images..."
 	imgs, labels = augment(imgs, labels)
+	print "Processing images..."
+	imgs, data_center = process_image(imgs)
 	#preview_imgs(imgs, 20)
-	imgs = np.array([np.array(img).reshape(config.img_size, config.img_size, config.n_channels) for img in imgs])
 	labels = np.array(labels)
 	return imgs, labels, data_center
 
@@ -76,7 +76,6 @@ def load_dev_data(img_path, label_path, data_center, mode='val'):
 	print "Resizing and processing images..."
 	imgs = resize_imgs(imgs)
 	imgs = process_image(imgs, data_center)
-	imgs = np.array([np.array(img).reshape(config.img_size, config.img_size, config.n_channels) for img in imgs])
 	labels = np.array(labels)
 	return imgs, labels
 
