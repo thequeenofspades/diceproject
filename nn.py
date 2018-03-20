@@ -24,6 +24,9 @@ class NN:
 		self.minibatch_idx = None
 		self.minibatches = []
 
+	def global_step(self):
+		return tf.train.global_step(self.sess, self.global_step)
+
 	def add_placeholders(self):
 		self.X_placeholder = tf.placeholder(tf.float32, (None, self.config.img_size, self.config.img_size, self.config.n_channels))
 		self.Y_placeholder = tf.placeholder(tf.int32, (None,))

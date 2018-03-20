@@ -52,8 +52,8 @@ if __name__ == '__main__':
 	else:
 		eval_pkl = {}
 
-	_, best_dev_acc, _ = eval(nn, orig_X_train, orig_Y_train, X_dev, Y_dev, 0, eval_pkl)
-	best_dev_acc_step = 0
+	_, best_dev_acc, _ = eval(nn, orig_X_train, orig_Y_train, X_dev, Y_dev, nn.global_step(), eval_pkl)
+	best_dev_acc_step = nn.global_step()
 
 	for i in range(times_to_eval):
 		losses, step, losses_pkl = train(nn, X_train, Y_train, config.eval_freq, losses, losses_pkl)
