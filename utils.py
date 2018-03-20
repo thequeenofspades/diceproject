@@ -98,7 +98,6 @@ def load_data(img_path, label_path, path, mode='val', exclude=[]):
 		img_name = line.split()[0]
 		img = Image.open(img_path + img_name + '.jpg')
 		img.load()
-		imgs.append(img)
 		label_file = open(label_path + img_name + '.txt', 'r')
 		label = [line for line in label_file][0].split()
 		label_file.close()
@@ -106,8 +105,10 @@ def load_data(img_path, label_path, path, mode='val', exclude=[]):
 			die_type = int(label[0])
 			if die_type not in exclude:
 				labels.append(config.val_class_mapping[int(label[1])])
+				imgs.append(img)
 		elif mode == 'type':
 			labels.append(config.type_class_mapping[int(label[0])])
+			imgs.append(img)
 	data_file.close()
 	analyze_labels(labels)
 	return imgs, labels
