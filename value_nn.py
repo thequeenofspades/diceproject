@@ -29,9 +29,10 @@ class ValueNN(NN):
 				out = tf.nn.relu(out)
 				out = tf.layers.max_pooling2d(out, 2, 2)
 				layers.append(out)
+		out_flat = tf.reshape(layers[-1], (-1, self.config.img_size**2 * self.config.n_channels))
 		with tf.variable_scope('fc1'):
 			hidden = tf.layers.dense(
-				tf.contrib.layers.flatten(layers[-1]),
+				out_flat,
 				hidden_size,
 				kernel_initializer=tf.contrib.layers.xavier_initializer(),
 				kernel_regularizer=regularizer)
