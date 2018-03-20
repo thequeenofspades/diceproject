@@ -19,6 +19,10 @@ class NN:
 		#Save/restore or initialize variables
 		self.setup()
 
+		#Initialize minibatches
+		self.minibatch_idx = None
+		self.minibatches = []
+
 	def add_placeholders(self):
 		self.X_placeholder = tf.placeholder(tf.float32, (None, self.config.img_size, self.config.img_size, self.config.n_channels))
 		self.Y_placeholder = tf.placeholder(tf.int32, (None,))
@@ -42,13 +46,31 @@ class NN:
 		preds = np.argmax(preds, 1)
 		return preds, accuracy
 
+	def get_train_minibatch(self):
+		num_minibatches = int(self.X.shape[0] / self.config.batch_size)
+		if self.config.batch_size * num_minibatches < self.X.shape[0]:
+			num_minibatches += 1
+		if self.minibatch_idx == None:
+			minibatch_idxs = range(self.X.shape[0])
+			random.shuffle(minibatch_idxs)
+			for i in range(num_minibatches):
+				self.minibatches.append(minibatch_idxs[i*self.config.batch_size:(i+1)*self.config.batch_size])
+			self.minibatch_idx = 0
+		X = self.X[self.minibatches[self.minibatch_idx]]
+		Y = self.Y[self.minibatches[self.minibatch_idx]]
+		self.minibatch_idx = (self.minibatch_idx + 1) % num_minibatches
+		return X, Y
+
 	def train(self, X, Y, steps=100, losses=[]):
+		self.X = X
+		self.Y = Y
 		batch_nums = []
 		for step in range(steps):
-			idx = np.random.choice(range(len(X)), self.config.batch_size, replace=False)
+			# idx = np.random.choice(range(len(X)), self.config.batch_size, replace=False)
+			X, Y = self.get_train_minibatch()
 			loss, preds, _ = self.sess.run((self.loss, self.preds, self.train_op), feed_dict={
-				self.X_placeholder: X[idx],
-				self.Y_placeholder: Y[idx],
+				self.X_placeholder: X,
+				self.Y_placeholder: Y,
 				self.dropout_placeholder: True})
 			losses.append(loss)
 			batch_nums.append(tf.train.global_step(self.sess, self.global_step))
@@ -57,6 +79,4 @@ class NN:
 				print "batch: %d, loss: %f, avg loss: %f, accuracy: %f" % (batch_nums[-1], loss, avg_loss, self.accuracy(preds, Y[idx]))
 				preds = np.argmax(preds, 1)
 				print "predictions: %s" % str(preds)
-			if batch_nums[-1] % self.config.save_freq == 0:
-				self.save()
 		return losses, batch_nums

@@ -8,7 +8,7 @@ from config import config
 import random
 
 def analyze_labels(labels):
-	print "%d examples" % len(labels)
+	print "Before augmentation: %d examples" % len(labels)
 	counts = {}
 	for label in labels:
 		value = label
@@ -23,11 +23,24 @@ def augment(imgs, labels):
 	new_imgs = []
 	new_labels = []
 	for i in range(len(imgs)):
-		new_imgs.append(imgs[i])
-		new_imgs.append(imgs[i].rotate(90))
-		new_imgs.append(imgs[i].rotate(180))
-		new_imgs.append(imgs[i].rotate(270))
-		new_labels = new_labels + [labels[i]] * 4
+		for j in range(4):
+			new_imgs.append(imgs[i].rotate(90*i))
+			new_labels.append(labels[i])
+	imgs = new_imgs
+	labels = new_labels
+	new_imgs = []
+	new_labels = []
+	for i in range(len(imgs)):
+		for j in range(4):
+			x1 = random.randint(0, imgs[i].width / 5)
+			y1 = random.randint(0, imgs[i].height / 5)
+			max_size = min(imgs[i].width - x1, imgs[i].height - y1)
+			min_size = max(3 * imgs[i].width / 5 - x1, 3 * imgs[i].height / 5 - y1)
+			size = random.randint(min_size, max_size)
+			new_img = imgs[i].crop((x1, y1, x1 + size, y1 + size))
+			new_img = new_img.resize((config.img_size, config.img_size))
+			new_imgs.append(new_img)
+			new_labels.append(labels[i])
 	return new_imgs, new_labels
 
 def convert_label(img, label, fm='yolo', img_fm=None):
@@ -69,6 +82,7 @@ def load_train_data(img_path, label_path, mode='val', exclude=[]):
 	imgs, data_center = process_image(imgs)
 	#preview_imgs(imgs, 20)
 	labels = np.array(labels)
+	print "After augmentation: %d examples" % labels.shape[0]
 	return imgs, labels, data_center
 
 def load_dev_data(img_path, label_path, data_center, mode='val', exclude=[]):
