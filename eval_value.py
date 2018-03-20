@@ -12,7 +12,7 @@ def analyze_errors(labels, preds, type_labels):
 	correct_by_label = {}
 	count_by_type = {}
 	correct_by_type = {}
-	for i in range(labels.shape[0]):
+	for i in range(len(labels)):
 		label = labels[i]
 		if label in count_by_label:
 			count_by_label[label] += 1
