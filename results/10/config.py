@@ -6,7 +6,7 @@ class config():
 	n_channels = 1
 
 	#Training params
-	batches = 50000
+	batches = 10000
 	batch_size = 16
 	save_freq = 5000
 	print_freq = 10
@@ -31,7 +31,7 @@ class config():
 						11: 10, 12: 11, 13: 12, 14: 13, 15: 14, 16: 15, 17: 16,
 						18: 17, 19: 18, 20: 19}
 	val_num_classes = 20
-	val_lamb = 0.01
+	val_lamb = 0.05
 	val_keep_prob = 0.5
 	val_lr = 0.0001
 	val_norm_decay = 0.9

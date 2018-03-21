@@ -41,6 +41,6 @@ class config():
 	val_filter_sizes = [5,5,5]#[5,5,5]#[11, 9, 7, 5, 3]
 	val_strides = [2,2,2]#[2,2,2]
 	val_fc_sizes = [512]
-	val_use_batch_norm = False
+	val_use_batch_norm = True
 	val_save_path = 'val/'
 	val_weights_to_restore = None
