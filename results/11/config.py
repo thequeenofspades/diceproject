@@ -12,7 +12,7 @@ class config():
 	print_freq = 10
 	eval_freq = 100
 	save_path = 'weights/'
-	exclude = []
+	exclude = [20]
 
 	#Type NN params
 	type_class_mapping = {4: 0, 6: 1, 8: 2, 10: 3, 100: 4, 12: 5, 20: 6}
@@ -33,7 +33,7 @@ class config():
 	val_num_classes = 20
 	val_lamb = 0.05
 	val_keep_prob = 0.5
-	val_lr = 0.0001
+	val_lr = 0.00001
 	val_norm_decay = 0.9
 	val_conv_layers = 3
 	val_fc_layers = 1
